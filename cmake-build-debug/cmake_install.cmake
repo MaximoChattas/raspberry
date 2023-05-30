@@ -1,4 +1,4 @@
-# Install script for directory: /Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/Proyecto
+# Install script for directory: /Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/raspberry
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/Proyecto/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/raspberry/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

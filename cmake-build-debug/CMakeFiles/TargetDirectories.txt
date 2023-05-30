@@ -1,3 +1,3 @@
-/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/Proyecto/cmake-build-debug/CMakeFiles/Proyecto.dir
-/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/Proyecto/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/Proyecto/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/raspberry/cmake-build-debug/CMakeFiles/Proyecto.dir
+/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/raspberry/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/maxichattas/Documents/UCC/3º Año/Arquitectura de Computadoras I/Práctico/Parciales/raspberry/cmake-build-debug/CMakeFiles/rebuild_cache.dir

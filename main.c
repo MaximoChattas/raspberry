@@ -24,11 +24,10 @@ void secuencia3(int time);
 void secuencia4(int time);
 //
 
+const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
+
 int main (void)
 {
-    unsigned char output;
-    char t;
-    int on_time;  /* set holding time */
     char setPassword[5] = {'h', 'e', 'l', 'l', 'o'};
     char passwordInput[5];
 
