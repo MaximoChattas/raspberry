@@ -15,7 +15,6 @@
 #define port_in  0x209
 //
 void disp_binary (int);
-void delay (int);
 
 void getPassword(char *password);
 void menu();
@@ -130,8 +129,24 @@ void menu() {
 void autoFantastico() {
     printf("Presione esc para finalizar la secuencia\n");
 
+    unsigned char output;
     while(!escapeHit())
     {
+        output = 0x80;
+        for (int i = 0 ; i < 8 ; i++)
+        {
+            disp_binary(output);
+            output = output >> 1;
+            delayMillis(100);
+        }
+        output = 0x2;
+
+        for (int i = 0 ; i < 6 ; i++)
+        {
+            disp_binary(output);
+            output = output << 1;
+            delayMillis(100);
+        }
 
     }
 
