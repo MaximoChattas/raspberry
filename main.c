@@ -7,6 +7,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <fcntl.h>
+#include "EasyPIO.h"
 
 #define PASSWORD_LENGTH 5
 #define port_out 0x208
@@ -15,19 +17,24 @@
 void disp_binary (int);
 void delay (int);
 
-int getch(void);
 void getPassword(char *password);
 void menu();
-void autoFantastico(int time);
-void choque(int time);
-void secuencia3(int time);
-void secuencia4(int time);
+void autoFantastico();
+void choque();
+void secuencia3();
+void secuencia4();
+
+struct termios modifyTerminalConfig(void);
+void restoreTerminalConfig(struct termios);
+bool escapeHit (void);
+void pinSetup(void);
 //
 
 const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
 
 int main (void)
 {
+//    pinSetup();
     char setPassword[5] = {'h', 'e', 'l', 'l', 'o'};
     char passwordInput[5];
 
@@ -40,9 +47,10 @@ int main (void)
 
         for(int j = 0 ; j < 5 ; j++)
         {
-            if(setPassword[i] != passwordInput[i])
+            if(setPassword[j] != passwordInput[j])
             {
                 passwordFlag = false;
+                break;
             }
         }
 
@@ -58,13 +66,7 @@ int main (void)
 
     }
 }
-void delay(int time)
-{
-    int i;
-    unsigned int j;
-    for(i=time; i>0; --i) /* repeat specified number of times */
-        for(j=0; j<65535; ++j);
-}
+
 void disp_binary (int i)
 {
     int t;
@@ -75,19 +77,8 @@ void disp_binary (int i)
 }
 
 void getPassword(char *password) {
-    struct termios oldattr, newattr;
 
-    // Get the current terminal attributes
-    tcgetattr(STDIN_FILENO, &oldattr);
-
-    // Copy the current attributes to the new attributes
-    newattr = oldattr;
-
-    // Disable canonical mode and echo
-    newattr.c_lflag &= ~(ICANON | ECHO);
-
-    // Apply the new attributes to the terminal
-    tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+    struct termios oldattr = modifyTerminalConfig();
 
     printf("Ingrese su clave: ");
 
@@ -98,8 +89,7 @@ void getPassword(char *password) {
         fflush(stdout);
     }
 
-    // Restore the original terminal attributes
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+    restoreTerminalConfig(oldattr);
 
     printf("\n");
 }
@@ -118,16 +108,16 @@ void menu() {
 
         switch (opcion) {
             case 1:
-                autoFantastico(1000);
+                autoFantastico();
                 break;
             case 2:
-                choque(1000);
+                choque();
                 break;
             case 3:
-                secuencia3(1000);
+                secuencia3(); //Race shift lights
                 break;
             case 4:
-                secuencia4(1000);
+                secuencia4();
                 break;
             case 0:
                 break;
@@ -137,22 +127,88 @@ void menu() {
     } while (opcion != 0);
 }
 
-void autoFantastico(int time) {
-    printf("Auto Fantastico\n");
+void autoFantastico() {
+    printf("Presione esc para finalizar la secuencia\n");
+
+    while(!escapeHit())
+    {
+
+    }
 
 }
 
-void choque(int time) {
+void choque() {
     printf("Choque\n");
 
 }
 
-void secuencia3(int time) {
+void secuencia3() {
     printf("Secuencia 3\n");
 
 }
 
-void secuencia4(int time) {
+void secuencia4() {
     printf("Secuencia 4\n");
+
+}
+
+struct termios modifyTerminalConfig(void) {
+    struct termios oldattr, newattr;
+
+    // Get the current terminal attributes
+    tcgetattr(STDIN_FILENO, &oldattr);
+
+    // Copy the current attributes to the new attributes
+    newattr = oldattr;
+
+    // Disable canonical mode and echo
+    newattr.c_lflag &= ~(ICANON | ECHO);
+
+    // Apply the new attributes to the terminal
+    tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+
+    return oldattr;
+}
+
+void restoreTerminalConfig(struct termios oldattr) {
+
+    // Restore the original terminal attributes
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+}
+
+bool escapeHit (void) {
+
+    struct termios oldattr = modifyTerminalConfig();
+    int ch, oldf;
+
+    // Set the file descriptor of the standard input to non-blocking mode
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    // Attempt to read a character from the standard input
+    ch = getchar();
+
+    restoreTerminalConfig(oldattr);
+
+    // Restore the file descriptor mode
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+    // If esc key is hit, return 1
+    if (ch == '\033') {
+        ungetc(ch, stdin);
+        return 1;
+    }
+
+    // Esc wasn't read, return 0
+    return 0;
+}
+
+void pinSetup(void) {
+    pioInit();
+
+    for (int i = 0 ; i < 8 ; i++)
+    {
+        pinMode(led[i], OUTPUT);
+    }
 
 }
