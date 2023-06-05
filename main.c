@@ -20,7 +20,7 @@ void getPassword(char *password);
 void menu();
 void autoFantastico();
 void choque();
-void secuencia3();
+void shiftLights();
 void secuencia4();
 
 struct termios modifyTerminalConfig(void);
@@ -72,7 +72,8 @@ void disp_binary (int i)
     for(t=128; t>0; t=t/2)
         if(i&t) printf("1 ");
         else printf("0 ");
-    printf("\n");
+    fflush(stdout);
+    printf("\r");
 }
 
 void getPassword(char *password) {
@@ -97,10 +98,11 @@ void menu() {
     int opcion;
 
     do {
+        fflush(stdin);
         printf("Seleccione una opcion:\n");
         printf("1: Auto Fantastico\n");
         printf("2: El Choque\n");
-        printf("3: Secuencia 3\n");
+        printf("3: Shift Lights\n");
         printf("4: Secuencia 4\n");
         printf("0: Salir\n");
         scanf("%d", &opcion);
@@ -113,7 +115,7 @@ void menu() {
                 choque();
                 break;
             case 3:
-                secuencia3(); //Race shift lights
+                shiftLights(); //Race shift lights
                 break;
             case 4:
                 secuencia4();
@@ -130,35 +132,80 @@ void autoFantastico() {
     printf("Presione esc para finalizar la secuencia\n");
 
     unsigned char output;
+
     while(!escapeHit())
     {
         output = 0x80;
         for (int i = 0 ; i < 8 ; i++)
         {
+            if (escapeHit()) break;
+
             disp_binary(output);
             output = output >> 1;
-            delayMillis(100);
+            usleep(100000);
         }
         output = 0x2;
 
         for (int i = 0 ; i < 6 ; i++)
         {
+            if (escapeHit()) break;
+
             disp_binary(output);
             output = output << 1;
-            delayMillis(100);
+            usleep(100000);
+        }
+
+    }
+}
+
+void choque() {
+    printf("Presione esc para finalizar la secuencia\n");
+
+    unsigned char output, aux1, aux2;
+
+    while(!escapeHit())
+    {
+        aux1 = 0x80;
+        aux2 = 0x1;
+        for (int i = 0 ; i < 7 ; i++)
+        {
+            if (escapeHit()) break;
+
+            output = aux1 | aux2;
+            disp_binary(output);
+            aux1 = aux1 >> 1;
+            aux2 = aux2 << 1;
+            usleep(100000);
         }
 
     }
 
 }
 
-void choque() {
-    printf("Choque\n");
+void shiftLights() {
+    printf("Presione esc para finalizar la secuencia\n");
 
-}
+    unsigned char output, aux1, aux2;
 
-void secuencia3() {
-    printf("Secuencia 3\n");
+    while(!escapeHit())
+    {
+        output = 0x0;
+        aux1 = 0x80;
+        aux2 = 0x1;
+        disp_binary(output);
+        for (int i = 0 ; i < 5 ; i++)
+        {
+            if (escapeHit()) break;
+            usleep(1000000);
+            output = aux1 | aux2;
+            disp_binary(output);
+            aux1 = aux1 >> 1;
+            aux1 = aux1 | 0b10000000;
+            aux2 = aux2 << 1;
+            aux2 = aux2 | 0b00000001;
+        }
+
+    }
 
 }
 
@@ -209,7 +256,7 @@ bool escapeHit (void) {
     fcntl(STDIN_FILENO, F_SETFL, oldf);
 
     // If esc key is hit, return 1
-    if (ch == '\033') {
+    if (ch == 27) {
         ungetc(ch, stdin);
         return 1;
     }
