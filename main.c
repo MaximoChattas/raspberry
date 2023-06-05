@@ -33,7 +33,7 @@ const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
 
 int main (void)
 {
-//    pinSetup();
+    pinSetup();
     char setPassword[5] = {'h', 'e', 'l', 'l', 'o'};
     char passwordInput[5];
 
@@ -140,6 +140,10 @@ void autoFantastico() {
         {
             if (escapeHit()) break;
 
+            for(int j = 0 ; j < 8 ; j++)
+            {
+                digitalWrite(led[j], (output >> j) & 1);
+            }
             disp_binary(output);
             output = output >> 1;
             usleep(100000);
@@ -150,6 +154,10 @@ void autoFantastico() {
         {
             if (escapeHit()) break;
 
+            for(int j = 0 ; j < 8 ; j++)
+            {
+                digitalWrite(led[j], (output >> j) & 1);
+            }
             disp_binary(output);
             output = output << 1;
             usleep(100000);
@@ -173,6 +181,10 @@ void choque() {
 
             output = aux1 | aux2;
             disp_binary(output);
+            for(int j = 0 ; j < 8 ; j++)
+            {
+                digitalWrite(led[j], (output >> j) & 1);
+            }
             aux1 = aux1 >> 1;
             aux2 = aux2 << 1;
             usleep(100000);
@@ -193,12 +205,20 @@ void shiftLights() {
         aux1 = 0x80;
         aux2 = 0x1;
         disp_binary(output);
+        for(int j = 0 ; j < 8 ; j++)
+        {
+            digitalWrite(led[j], (output >> j) & 1);
+        }
         for (int i = 0 ; i < 5 ; i++)
         {
             if (escapeHit()) break;
             usleep(1000000);
             output = aux1 | aux2;
             disp_binary(output);
+            for(int j = 0 ; j < 8 ; j++)
+            {
+                digitalWrite(led[j], (output >> j) & 1);
+            }
             aux1 = aux1 >> 1;
             aux1 = aux1 | 0b10000000;
             aux2 = aux2 << 1;
