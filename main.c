@@ -27,9 +27,11 @@ struct termios modifyTerminalConfig(void);
 void restoreTerminalConfig(struct termios);
 bool escapeHit (void);
 void pinSetup(void);
+void ledShow(unsigned char);
 //
 
 const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
+int delay = 100;
 
 int main (void)
 {
@@ -115,7 +117,7 @@ void menu() {
                 choque();
                 break;
             case 3:
-                shiftLights(); //Race shift lights
+                shiftLights();
                 break;
             case 4:
                 secuencia4();
@@ -130,6 +132,7 @@ void menu() {
 
 void autoFantastico() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Auto Fantastico:\n");
 
     unsigned char output;
 
@@ -139,14 +142,10 @@ void autoFantastico() {
         for (int i = 0 ; i < 8 ; i++)
         {
             if (escapeHit()) break;
-
-            for(int j = 0 ; j < 8 ; j++)
-            {
-                digitalWrite(led[j], (output >> j) & 1);
-            }
+            ledShow(output);
             disp_binary(output);
             output = output >> 1;
-            usleep(100000);
+            usleep(delay);
         }
         output = 0x2;
 
@@ -154,13 +153,10 @@ void autoFantastico() {
         {
             if (escapeHit()) break;
 
-            for(int j = 0 ; j < 8 ; j++)
-            {
-                digitalWrite(led[j], (output >> j) & 1);
-            }
+            ledShow(output);
             disp_binary(output);
             output = output << 1;
-            usleep(100000);
+            usleep(delay);
         }
 
     }
@@ -168,6 +164,7 @@ void autoFantastico() {
 
 void choque() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Choque:\n");
 
     unsigned char output, aux1, aux2;
 
@@ -181,13 +178,10 @@ void choque() {
 
             output = aux1 | aux2;
             disp_binary(output);
-            for(int j = 0 ; j < 8 ; j++)
-            {
-                digitalWrite(led[j], (output >> j) & 1);
-            }
+            ledShow(output);
             aux1 = aux1 >> 1;
             aux2 = aux2 << 1;
-            usleep(100000);
+            usleep(delay);
         }
 
     }
@@ -196,6 +190,7 @@ void choque() {
 
 void shiftLights() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Shift Lights:\n");
 
     unsigned char output, aux1, aux2;
 
@@ -205,20 +200,16 @@ void shiftLights() {
         aux1 = 0x80;
         aux2 = 0x1;
         disp_binary(output);
-        for(int j = 0 ; j < 8 ; j++)
-        {
-            digitalWrite(led[j], (output >> j) & 1);
-        }
+        ledShow(output);
+
         for (int i = 0 ; i < 5 ; i++)
         {
             if (escapeHit()) break;
-            usleep(1000000);
+            usleep(delay);
             output = aux1 | aux2;
             disp_binary(output);
-            for(int j = 0 ; j < 8 ; j++)
-            {
-                digitalWrite(led[j], (output >> j) & 1);
-            }
+            ledShow(output);
+
             aux1 = aux1 >> 1;
             aux1 = aux1 | 0b10000000;
             aux2 = aux2 << 1;
@@ -294,3 +285,17 @@ void pinSetup(void) {
     }
 
 }
+
+void ledShow(unsigned char output) {
+
+    for(int j = 0 ; j < 8 ; j++)
+    {
+        digitalWrite(led[j], (output >> j) & 1);
+    }
+
+}
+
+//En Assembly se deben usar los registros preservables (salvarlos con push a estos y LR)
+//Cuando se termina, se retorna con un pop recuperando los registros preservados y en PC se pone lo que se preservó de LR
+//Modificar funcion delay, llamar varias veces a delaymilis y verificar la entrada de teclas para salir y velocidad
+
