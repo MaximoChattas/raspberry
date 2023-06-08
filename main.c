@@ -8,55 +8,64 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <fcntl.h>
+#include <ncurses.h>
 #include "EasyPIO.h"
+#include "assembly_functions.h"
 
 #define PASSWORD_LENGTH 5
-#define port_out 0x208
-#define port_in  0x209
+
 //
-void disp_binary (int);
+void disp_binary(int);
 
 void getPassword(char *password);
+
 void menu();
+
 void autoFantastico();
+
 void choque();
+
 void shiftLights();
-void secuencia4();
+
+void sirena();
 
 struct termios modifyTerminalConfig(void);
+
 void restoreTerminalConfig(struct termios);
-bool escapeHit (void);
+
+bool keyHit(int index);
+
 void pinSetup(void);
+
 void ledShow(unsigned char);
+
+int delay(int index);
+
+void clearInputBuffer();
 //
 
 const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
-int delay = 100;
+int delayTime[] = {10000, 10000, 10000, 10000};
 
-int main (void)
-{
-    pinSetup();
+int main(void) {
+//    pinSetup();
     char setPassword[5] = {'h', 'e', 'l', 'l', 'o'};
     char passwordInput[5];
 
     //Receive password and checks it
     //If it receives an incorrect password 3 times, it aborts
-    for (int i = 0 ; i < 3 ; i++)
-    {
+    for (int i = 0; i < 3; i++) {
         bool passwordFlag = true;
         getPassword(passwordInput);
 
-        for(int j = 0 ; j < 5 ; j++)
-        {
-            if(setPassword[j] != passwordInput[j])
-            {
+        for (int j = 0; j < 5; j++) {
+            if (setPassword[j] != passwordInput[j]) {
                 passwordFlag = false;
                 break;
             }
         }
 
-        if (passwordFlag)
-        {
+        if (passwordFlag) {
             printf("Bienvenido al sistema !\n\n");
             menu();
             printf("Hasta luego !\n");
@@ -68,11 +77,10 @@ int main (void)
     }
 }
 
-void disp_binary (int i)
-{
+void disp_binary(int i) {
     int t;
-    for(t=128; t>0; t=t/2)
-        if(i&t) printf("1 ");
+    for (t = 128; t > 0; t = t / 2)
+        if (i & t) printf("1 ");
         else printf("0 ");
     fflush(stdout);
     printf("\r");
@@ -105,7 +113,7 @@ void menu() {
         printf("1: Auto Fantastico\n");
         printf("2: El Choque\n");
         printf("3: Shift Lights\n");
-        printf("4: Secuencia 4\n");
+        printf("4: Sirena\n");
         printf("0: Salir\n");
         scanf("%d", &opcion);
 
@@ -120,7 +128,7 @@ void menu() {
                 shiftLights();
                 break;
             case 4:
-                secuencia4();
+                sirena();
                 break;
             case 0:
                 break;
@@ -132,31 +140,29 @@ void menu() {
 
 void autoFantastico() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Presione W para aumentar la velocidad\n");
+    printf("Presione S para disminuir la velocidad\n");
     printf("Auto Fantastico:\n");
 
     unsigned char output;
 
-    while(!escapeHit())
-    {
+    while (true) {
         output = 0x80;
-        for (int i = 0 ; i < 8 ; i++)
-        {
-            if (escapeHit()) break;
-            ledShow(output);
+        for (int i = 0; i < 8; i++) {
+//            ledShow(output);
             disp_binary(output);
             output = output >> 1;
-            usleep(delay);
+
+            if (delay(0) == 0) return;
         }
         output = 0x2;
 
-        for (int i = 0 ; i < 6 ; i++)
-        {
-            if (escapeHit()) break;
-
-            ledShow(output);
+        for (int i = 0; i < 6; i++) {
+//            ledShow(output);
             disp_binary(output);
             output = output << 1;
-            usleep(delay);
+
+            if (delay(0) == 0) return;
         }
 
     }
@@ -164,24 +170,23 @@ void autoFantastico() {
 
 void choque() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Presione W para aumentar la velocidad\n");
+    printf("Presione S para disminuir la velocidad\n");
     printf("Choque:\n");
 
     unsigned char output, aux1, aux2;
 
-    while(!escapeHit())
-    {
+    while (true) {
         aux1 = 0x80;
         aux2 = 0x1;
-        for (int i = 0 ; i < 7 ; i++)
-        {
-            if (escapeHit()) break;
-
+        for (int i = 0; i < 7; i++) {
             output = aux1 | aux2;
+//            ledShow(output);
             disp_binary(output);
-            ledShow(output);
             aux1 = aux1 >> 1;
             aux2 = aux2 << 1;
-            usleep(delay);
+
+            if (delay(1) == 0) return;
         }
 
     }
@@ -190,38 +195,55 @@ void choque() {
 
 void shiftLights() {
     printf("Presione esc para finalizar la secuencia\n");
+    printf("Presione W para aumentar la velocidad\n");
+    printf("Presione S para disminuir la velocidad\n");
     printf("Shift Lights:\n");
 
     unsigned char output, aux1, aux2;
 
-    while(!escapeHit())
-    {
+    while (true) {
         output = 0x0;
         aux1 = 0x80;
         aux2 = 0x1;
         disp_binary(output);
-        ledShow(output);
+//        ledShow(output);
 
-        for (int i = 0 ; i < 5 ; i++)
-        {
-            if (escapeHit()) break;
-            usleep(delay);
+        for (int i = 0; i < 5; i++) {
+            if (delay(2) == 0) return;
+
             output = aux1 | aux2;
+//            ledShow(output);
             disp_binary(output);
-            ledShow(output);
 
             aux1 = aux1 >> 1;
             aux1 = aux1 | 0b10000000;
             aux2 = aux2 << 1;
             aux2 = aux2 | 0b00000001;
+
         }
 
     }
 
 }
 
-void secuencia4() {
-    printf("Secuencia 4\n");
+void sirena() {
+    printf("Presione esc para finalizar la secuencia\n");
+    printf("Presione W para aumentar la velocidad\n");
+    printf("Presione S para disminuir la velocidad\n");
+    printf("Shift Lights:\n");
+
+    unsigned char sirena[] = {0x0, 0xF, 0xF, 0xF0, 0xF0, 0x0, 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+
+    while (true) {
+        int i;
+
+        for(i = 0 ; i < 21 ; i++)
+        {
+//            ledShow(sirena[i]);
+            disp_binary(sirena[i]);
+            if (delay(3) == 0) return;
+        }
+    }
 
 }
 
@@ -249,7 +271,7 @@ void restoreTerminalConfig(struct termios oldattr) {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
 }
 
-bool escapeHit (void) {
+bool keyHit(int index) {
 
     struct termios oldattr = modifyTerminalConfig();
     int ch, oldf;
@@ -260,6 +282,19 @@ bool escapeHit (void) {
 
     // Attempt to read a character from the standard input
     ch = getchar();
+
+    //W key is hit
+    if(ch == 119) {
+        if(delayTime[index] > 1000)
+        {
+            delayTime[index] = delayTime[index] - 1000;
+        }
+    }
+
+    //S key is hit
+    if(ch == 115) {
+        delayTime[index] = delayTime[index] + 1000;
+    }
 
     restoreTerminalConfig(oldattr);
 
@@ -272,15 +307,15 @@ bool escapeHit (void) {
         return 1;
     }
 
-    // Esc wasn't read, return 0
+
+    // Esc wasn't hit, return 0
     return 0;
 }
 
 void pinSetup(void) {
     pioInit();
 
-    for (int i = 0 ; i < 8 ; i++)
-    {
+    for (int i = 0; i < 8; i++) {
         pinMode(led[i], OUTPUT);
     }
 
@@ -288,14 +323,35 @@ void pinSetup(void) {
 
 void ledShow(unsigned char output) {
 
-    for(int j = 0 ; j < 8 ; j++)
-    {
+    for (int j = 0; j < 8; j++) {
         digitalWrite(led[j], (output >> j) & 1);
     }
 
 }
 
+int delay(int index)
+{
+    int i;
+    unsigned int j;
+    for(i=delayTime[index]; i > 0; --i) /* repeat specified number of times */
+
+            if(keyHit(index)) {
+                return 0;
+            }
+
+    return 1;
+}
+
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+        // Discard characters
+    }
+    fpurge(stdin);  // Flush the input buffer
+}
+
 //En Assembly se deben usar los registros preservables (salvarlos con push a estos y LR)
 //Cuando se termina, se retorna con un pop recuperando los registros preservados y en PC se pone lo que se preservó de LR
-//Modificar funcion delay, llamar varias veces a delaymilis y verificar la entrada de teclas para salir y velocidad
+//Modificar funcion delayTime, llamar varias veces a delaymilis y verificar la entrada de teclas para salir y velocidad
 
