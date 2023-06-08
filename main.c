@@ -42,6 +42,8 @@ void ledShow(unsigned char);
 int delay(int index);
 
 void clearInputBuffer();
+
+void turnOff();
 //
 
 const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
@@ -166,6 +168,8 @@ void autoFantastico() {
         }
 
     }
+
+    turnOff();
 }
 
 void choque() {
@@ -190,6 +194,8 @@ void choque() {
         }
 
     }
+
+    turnOff();
 
 }
 
@@ -224,9 +230,11 @@ void shiftLights() {
 
     }
 
+    turnOff();
+
 }
 
-/*void sirena() {
+void sirena() {
     printf("Presione esc para finalizar la secuencia\n");
     printf("Presione W para aumentar la velocidad\n");
     printf("Presione S para disminuir la velocidad\n");
@@ -245,7 +253,9 @@ void shiftLights() {
         }
     }
 
-}*/
+    turnOff();
+
+}
 
 struct termios modifyTerminalConfig(void) {
     struct termios oldattr, newattr;
@@ -349,6 +359,12 @@ void clearInputBuffer() {
     {
         // Discard characters
     }
+}
+
+void turnOff() {
+    unsigned char off = 0x0;
+    ledShow(off);
+
 }
 
 //En Assembly se deben usar los registros preservables (salvarlos con push a estos y LR)
