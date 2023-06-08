@@ -155,7 +155,10 @@ void autoFantastico() {
             disp_binary(output);
             output = output >> 1;
 
-            if (delay(0) == 0) return;
+            if (delay(0) == 0) {
+                turnOff();
+                return;
+            }
         }
         output = 0x2;
 
@@ -164,12 +167,13 @@ void autoFantastico() {
             disp_binary(output);
             output = output << 1;
 
-            if (delay(0) == 0) return;
+            if (delay(0) == 0) {
+                turnOff();
+                return;
+            }
         }
 
     }
-
-    turnOff();
 }
 
 void choque() {
@@ -190,12 +194,13 @@ void choque() {
             aux1 = aux1 >> 1;
             aux2 = aux2 << 1;
 
-            if (delay(1) == 0) return;
+            if (delay(1) == 0) {
+                turnOff();
+                return;
+            }
         }
 
     }
-
-    turnOff();
 
 }
 
@@ -215,7 +220,10 @@ void shiftLights() {
         ledShow(output);
 
         for (int i = 0; i < 5; i++) {
-            if (delay(2) == 0) return;
+            if (delay(2) == 0) {
+                turnOff();
+                return;
+            }
 
             output = aux1 | aux2;
             ledShow(output);
@@ -229,8 +237,6 @@ void shiftLights() {
         }
 
     }
-
-    turnOff();
 
 }
 
@@ -249,11 +255,12 @@ void sirena() {
         {
             ledShow(sirena[i]);
             disp_binary(sirena[i]);
-            if (delay(3) == 0) return;
+            if (delay(3) == 0) {
+                turnOff();
+                return;
+            }
         }
     }
-
-    turnOff();
 
 }
 
