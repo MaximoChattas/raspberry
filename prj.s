@@ -7,15 +7,16 @@ PUSH {r4, r5, lr}
 LDR R4, =sirenad
 
 loop:
+
 LDRB R5, [R4], #1
 
 MOV R0, R5
 BL disp_binary //display on screen
 
-MVN R0, R5
-;BL ledShow
+MOV R0, R5
+BL ledShow
 
-MOV R0, #3 ;Index for array in c
+MOV R0, #3 //Index for array in c
 BL delay
 
 CMP R0, #0

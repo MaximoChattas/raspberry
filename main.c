@@ -27,7 +27,7 @@ void choque();
 
 void shiftLights();
 
-void sirena();
+//void sirena();
 
 struct termios modifyTerminalConfig(void);
 
@@ -48,7 +48,7 @@ const unsigned char led[] = {14, 15, 18, 23, 24, 25, 8, 7};
 int delayTime[] = {10000, 10000, 10000, 10000};
 
 int main(void) {
-//    pinSetup();
+    pinSetup();
     char setPassword[5] = {'h', 'e', 'l', 'l', 'o'};
     char passwordInput[5];
 
@@ -108,7 +108,7 @@ void menu() {
     int opcion;
 
     do {
-        fflush(stdin);
+        clearInputBuffer();
         printf("Seleccione una opcion:\n");
         printf("1: Auto Fantastico\n");
         printf("2: El Choque\n");
@@ -149,7 +149,7 @@ void autoFantastico() {
     while (true) {
         output = 0x80;
         for (int i = 0; i < 8; i++) {
-//            ledShow(output);
+            ledShow(output);
             disp_binary(output);
             output = output >> 1;
 
@@ -158,7 +158,7 @@ void autoFantastico() {
         output = 0x2;
 
         for (int i = 0; i < 6; i++) {
-//            ledShow(output);
+            ledShow(output);
             disp_binary(output);
             output = output << 1;
 
@@ -181,7 +181,7 @@ void choque() {
         aux2 = 0x1;
         for (int i = 0; i < 7; i++) {
             output = aux1 | aux2;
-//            ledShow(output);
+            ledShow(output);
             disp_binary(output);
             aux1 = aux1 >> 1;
             aux2 = aux2 << 1;
@@ -206,13 +206,13 @@ void shiftLights() {
         aux1 = 0x80;
         aux2 = 0x1;
         disp_binary(output);
-//        ledShow(output);
+        ledShow(output);
 
         for (int i = 0; i < 5; i++) {
             if (delay(2) == 0) return;
 
             output = aux1 | aux2;
-//            ledShow(output);
+            ledShow(output);
             disp_binary(output);
 
             aux1 = aux1 >> 1;
@@ -226,7 +226,7 @@ void shiftLights() {
 
 }
 
-void sirena() {
+/*void sirena() {
     printf("Presione esc para finalizar la secuencia\n");
     printf("Presione W para aumentar la velocidad\n");
     printf("Presione S para disminuir la velocidad\n");
@@ -239,13 +239,13 @@ void sirena() {
 
         for(i = 0 ; i < 21 ; i++)
         {
-//            ledShow(sirena[i]);
+            ledShow(sirena[i]);
             disp_binary(sirena[i]);
             if (delay(3) == 0) return;
         }
     }
 
-}
+}*/
 
 struct termios modifyTerminalConfig(void) {
     struct termios oldattr, newattr;
@@ -335,20 +335,20 @@ int delay(int index)
     unsigned int j;
     for(i=delayTime[index]; i > 0; --i) /* repeat specified number of times */
 
-            if(keyHit(index)) {
-                return 0;
-            }
+        if(keyHit(index)) {
+            return 0;
+        }
 
     return 1;
 }
 
 void clearInputBuffer() {
+    printf("Presione ENTER para confirmar\n");
     int c;
     while ((c = getchar()) != '\n' && c != EOF)
     {
         // Discard characters
     }
-    fpurge(stdin);  // Flush the input buffer
 }
 
 //En Assembly se deben usar los registros preservables (salvarlos con push a estos y LR)
