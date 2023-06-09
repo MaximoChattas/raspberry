@@ -25,7 +25,7 @@ void autoFantastico();
 
 void choque();
 
-void shiftLights();
+//void shiftLights();
 
 //void sirena();
 
@@ -204,7 +204,7 @@ void choque() {
 
 }
 
-void shiftLights() {
+/*void shiftLights() {
     printf("Presione esc para finalizar la secuencia\n");
     printf("Presione W para aumentar la velocidad\n");
     printf("Presione S para disminuir la velocidad\n");
@@ -238,9 +238,9 @@ void shiftLights() {
 
     }
 
-}
+}*/
 
-void sirena() {
+/*void sirena() {
     printf("Presione esc para finalizar la secuencia\n");
     printf("Presione W para aumentar la velocidad\n");
     printf("Presione S para disminuir la velocidad\n");
@@ -262,7 +262,7 @@ void sirena() {
         }
     }
 
-}
+}*/
 
 struct termios modifyTerminalConfig(void) {
     struct termios oldattr, newattr;
@@ -373,8 +373,3 @@ void turnOff() {
     ledShow(off);
 
 }
-
-//En Assembly se deben usar los registros preservables (salvarlos con push a estos y LR)
-//Cuando se termina, se retorna con un pop recuperando los registros preservados y en PC se pone lo que se preservó de LR
-//Modificar funcion delayTime, llamar varias veces a delaymilis y verificar la entrada de teclas para salir y velocidad
-
