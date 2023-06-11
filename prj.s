@@ -2,7 +2,7 @@
 
 .global shiftLights
 shiftLights:
-PUSH {r4, r5, r6, lr}
+PUSH {R4, R5, R6, R7, LR}
 
 resetS:
 MOV R5, #0x1 //aux2
@@ -44,14 +44,14 @@ CMP R0, #0
 BNE loopS
 BL turnOff
 
-POP {R4, R5, R6, PC}
+POP {R4, R5, R6, R7, PC}
 
 
 
 .global sirena
 sirena:
 
-PUSH {r4, r5, r6, lr}
+PUSH {R4, R5, R6, LR}
 
 reset:
 LDR R4, =sirenad
